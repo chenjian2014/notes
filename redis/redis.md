@@ -185,11 +185,11 @@ pubsub numsub chann  # 李处当前频道的订阅者数量
 
 ### 复制
 
-![image-20190425132814790](image/image-20190425132814790.png)
+![image-20190425132814790](image-20190425132814790.png)
 
 主从链: 从服务器可以拥有自己的从服务器
 
-![image-20190425141735123](image/image-20190425141735123.png)
+![image-20190425141735123](image-20190425141735123.png)
 
 ##### 检测
 
@@ -201,7 +201,7 @@ pubsub numsub chann  # 李处当前频道的订阅者数量
 
 ​        检查aof_pending_bio_fsync
 
-![image-20190425142718336](image/image-20190425142718336.png)
+![image-20190425142718336](image-20190425142718336.png)
 
 
 
@@ -217,7 +217,7 @@ unwatch: 在 watch执行后, multi执行前对连接重置
 
 discard: multi 执行后, exec 执行前, 取消 watch并清空所有已入队的事务命令
 
-![image-20190425145805603](image/image-20190425145805603.png)
+![image-20190425145805603](image-20190425145805603.png)
 
 watch 是乐观锁
 
