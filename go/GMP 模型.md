@@ -2,6 +2,8 @@
 
 参考: https://studygolang.com/articles/11627
 
+https://www.cnblogs.com/xc1234/p/8995698.html
+
 M: 代表内核线程
 
 G: 代表 goroutine

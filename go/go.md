@@ -29,7 +29,7 @@ func receive(x chan<- int)
 ### 有缓存 channel 与无缓冲 channel 区别
 
 ```go
-// 无缓冲 channel 发送接收同时发生, 下面示例会 panic, 显示 send on closed channel
+// 无缓冲 channel 发送接收[同时]发生, 下面示例会 panic, 显示 send on closed channel
 // 但是有缓存 channel 不会出现此类 panic
 func main() {
 	c := make(chan int)
