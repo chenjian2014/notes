@@ -55,7 +55,7 @@ docker run -p 80:8000 -e DEBUG=true -v /local:/data image:tag
 
 ## 搭建私有仓库 
 
-harbor
+​	
 
 
 

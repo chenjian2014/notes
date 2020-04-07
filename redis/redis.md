@@ -21,7 +21,7 @@ getset mykey newval # 设置新值, 返回旧值
 
 set counter 100  # 注意只有数字才能加
 incr counter  # 加1
-decr counter  # 减1
+decr counter  # 减1	
 incrby counter 50  # 加50
 
 mset a 10 b 20 c 30 # 批量设置
@@ -54,7 +54,7 @@ lrange mylist 0 -1  # 范围查看数据, 注意因为是 linked list, 所以从
 ltrim mylist 0 3  # 移除指定范围外的数据, 和 lrange 配合使用可以保证生成并获取定长数组, 例如 top10
 
 brpop mylist 5  # 阻塞 pop, 超时5秒. 用于 producer/consumer 模式很好用
-lrpip mylist 0  # 阻塞 pop, 永不超时.
+blpop mylist 0  # 阻塞 pop, 永不超时.
 
 ```
 
@@ -151,7 +151,7 @@ pfcount hll
 订阅最大的问题在于, 如果消费者断开连接, 则丢失断开时候的所有消息
 
 ```shell
-subscribe channel1 channel2   # 订阅
+subscribe channe1 channel2   # 订阅
 psubscribe channel*   # 匹配所有channel开头的频道
 publish channel1 aaaa   # 发布
 unsubscribe channel1  # 取消订阅

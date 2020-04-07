@@ -1,0 +1,122 @@
+# mysql
+
+hash碰撞解决策略
+    1. 开放地址
+        线性探查法
+        二次探查法
+        原理: (hash(key) + number) mod length
+    2. 链表
+
+树:
+    1. 二叉树: 每个节点最多有两个子节点的树
+    2. 二叉搜索树: 对于节点 n, 左子树全小于n, 右子树全大于 n
+    3. 平衡二叉树: 左右子树高度差不超过 1
+    4. 完全二叉树: 除最后一层全满, 最后一层连续集中在左边
+    5. 红黑树: 有红黑节点的自平衡的二叉搜索树; 包含左旋, 右旋, 变色; 根节点黑色, 叶子节点黑色, 红色节点的子节点黑色, 任一节点到叶子节点包含数量相同的黑节点
+    6. B 树: 一个 m 阶树, 每个节点有 k=[2/m, m] 个子节点, 并且节点包含 k-1个关键字, 叶子结点都位于同一层, 关键字的区间即子树的区间
+    7. B+树: 一个 m 阶树, 每个节点有 k=[2/m, m] 个子节点, 并且节点包含 k  个关键字, 叶子结点都位于同一层, 中间节点不保存数据, 
+            叶子节点保存所有数据, 并且从小到大顺序连接, 中间节点都保存在子节点
+
+
+B 树与 B+ 树:
+    B 树所有节点都保存数据, 不必每次都查到叶子节点, 所以单条查询性能高
+    B+ 树只有叶子节点保存, 每个磁盘页可以保存更多索引
+    B+ 树所有叶子节点通过指针顺序相连, 方便范围查询
+    B+ 树由于每次查询到叶子节点, 效率更平均
+
+为什么 mongo 用 B树, mysql 用 B+ 树:
+    mongo 遍历少
+    mysql 遍历多
+
+
+hash 索引与 B+ 树区别:
+    hash 索引:
+        等值查询快
+        不支持范围查询
+        不支持索引加速排序
+        不支持联合索引最左前缀匹配
+        不支持 like 'aa%'
+    b+树:
+        磁盘读写 io 少
+
+sql 执行偶尔很慢
+    1. 刷脏页
+    2. 锁住
+
+sql 执行一直很慢
+    没走索引
+    解决方案: 
+        慢日志查询: slow_query_log, slow_query_log_file
+        explain
+
+
+mysql 什么情况不走索引:
+    1. in 操作, 如果太多不走
+    2. like '%xxx'
+    3. !=, not in 
+    4. null 值存在标志位上, 不走索引
+    5. 函数, f(x) 
+    6. 优化器可能不走索引: 例如 1 > a > 100 这种. 优化器预测规则: 采样, 根据区分度判断
+    7. 复合索引, 后面的字段用不到索引
+
+
+事务原理
+    1. 重做日志 redo log
+        分为 redo log buffer 和 redo log file
+    2. 回滚日志 undo log
+        用于回滚日志
+    3. mvcc
+        每一行额外存储 行id(DB_ROW_ID), 事务id(DATA_TRX_ID), 回滚指针(DATA_ROLL_PTR)
+        更新过程: 排他锁锁定该行; 当前值复制到 undo log; 修改值, 事务 id 自增, 回滚指针指向旧值, 多个更新会组成链表; 记录redo log
+        查询过程: 根据事务 id 生成 可读视图(ReadView)
+
+
+自动更新时间:
+  insert_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+大表优化:
+    1. 加索引
+    2. 加 redis 缓存
+    3. 主从复制, 读写分离
+    4. 分区表
+    5. 垂直分表
+    6. 水平分表
+    
+事务:
+    ACID: 原子性, 一致性, 隔离性, 持久性
+    隔离级别: 未提交读, 已提交读, 可重复读, 串行化
+    读: 脏读, 不可重复读, 幻读
+    
+主从复制:
+    异步复制: 主库操作完成返回, 不关心从库, 默认
+    全同步复制: 主库和所有从库都执行才返回
+    半同步复制: 主库操作完成, 并且至少一个从库执行才返回
+
+主从同步过程:
+    1. master 写 binlog
+    2. slave 复制到 relay-log
+    3. slave 执行 binlog
+
+mysql 高可用集群
+    mysql cluster
+    zookeeper + proxy + 主从
+    MHA: 分为 manager, node
+
+update 过程
+    1. 开启事务, 写 undo log
+    2. buffer pool 查找数据, 查不到则从磁盘加载, 然后修改
+    3. 更新内容写到 redo log
+    4. 如果开启 binlog, 则写
+    5. 当提交 COMMIT 后, 进入二阶段提交, prepare 阶段 将 redo log 刷入磁盘, commit 阶段 将 binglog 刷入磁盘
+
+分布式事务
+    二阶段: 参与者和协调者, prepare, commit, rollback
+    三阶段: CanCommit, PreCommit, doCommit, 与二阶段比, 多了CanCommit, 并引入超时机制
+
+分布式事务二阶段四种模式:
+    XA: AP, RM, TM; 分支事务 RM一阶段提交给TM, TM 通知 RM commit/rollback
+    AT: 无侵入, seata 实现: 拦截 sql, 一阶段更新后保存 before_image, after_image, 加锁, 二阶段根据 image 回滚
+    TCC: 实现 Try, Confirm 和 Cancel 三个操作, 无锁, 性能高, 必须具备幂等性
+    saga: 实现正向和逆向回滚操作
+    后续学习: https://zhuanlan.zhihu.com/p/78599954
