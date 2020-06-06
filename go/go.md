@@ -60,3 +60,57 @@ context.WithTimeout
 context.WithCancel
 context.WithDeadline
 ```
+
+```go
+// context.WithTimeout 用法
+func main()  {
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	if res, err := f(ctx); err != nil {
+		log.Println(err.Error())
+	} else {
+		log.Println(res)
+	}
+}
+
+func f(ctx context.Context) (int, error) {
+	res := make(chan int)
+	go func() {
+		time.Sleep(6*time.Second)
+		res <- 10
+	}()
+
+	select {
+	case <- ctx.Done():
+		return 0, errors.New("超时")
+	case r := <- res:
+		return r, nil
+	}
+}
+```
+
+```go
+// time.After 用法
+func main()  {
+	if res, err := f(5*time.Second); err != nil {
+		log.Println(err.Error())
+	} else {
+		log.Println(res)
+	}
+}
+
+func f(duration time.Duration) (int, error) {
+	res := make(chan int)
+	go func() {
+		time.Sleep(6*time.Second)
+		res <- 10
+	}()
+
+	select {
+	case <- time.After(duration):
+		return 0, errors.New("超时")
+	case r := <- res:
+		return r, nil
+	}
+}
+```
+

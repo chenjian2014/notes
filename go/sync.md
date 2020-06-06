@@ -149,7 +149,9 @@ func main() {
 }
 ```
 
+### atomic.Value
 
+有 load 和 store 操作
 
 ### 参考
 

@@ -1,5 +1,22 @@
 # kafka
 
+### 副本
+
+leader 副本, 进行读写
+
+follower 副本: 备份 leader 数据
+
+ISR: 和 leader保持同步的 follower 副本, 用于选举
+
+### acks机制
+
+0: 发送不等待, 
+
+1: leader 收到就会响应, 
+
+all: 所有ISR从节点全部收到消息才响应
+
+
 
 发送方式:
     send: get则阻塞等待, 是同步调用; 传入 callback 则异步发送

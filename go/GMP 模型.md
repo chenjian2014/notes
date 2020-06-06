@@ -8,7 +8,7 @@ M: 代表内核线程
 
 G: 代表 goroutine
 
-P: Processor, 处理器, 维护一个 G 的队列, 负责执行G. p 代表真正的并行度, 可以通过 runtime.GOMAXPROCS 设置.
+P: Processor, 处理器, 维护一个 G 的队列, 负责执行G. 可以通过 runtime.GOMAXPROCS 设置.
 
 ​	默认值是 cpu 核数
 
